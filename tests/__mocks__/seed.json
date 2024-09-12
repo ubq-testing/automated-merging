@@ -18,11 +18,23 @@
   "reviews": [
     {
       "id": 1,
-      "state": "APPROVED"
+      "state": "APPROVED",
+      "author_association": "MEMBER"
     },
     {
       "id": 2,
-      "state": "APPROVED"
+      "state": "APPROVED",
+      "author_association": "COLLABORATOR"
+    },
+    {
+      "id": 3,
+      "state": "APPROVED",
+      "author_association": "CONTRIBUTOR"
+    },
+    {
+      "id": 4,
+      "state": "APPROVED",
+      "author_association": "NONE"
     }
   ]
 }

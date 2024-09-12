@@ -24,5 +24,6 @@ export const db = factory({
   reviews: {
     id: primaryKey(Number),
     state: String,
+    author_association: String,
   },
 });

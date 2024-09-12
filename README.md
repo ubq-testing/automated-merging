@@ -1,6 +1,6 @@
 # `@ubiquibot/automated-merging`
 
-Automatically merge pull-requests based on the reviewer count, the time elapsed since the last activity, depending 
+Automatically merge pull-requests based on the reviewer count, the time elapsed since the last activity, depending
 on the association of the pull-request author.
 
 ## Configuration example
@@ -17,6 +17,10 @@ on the association of the pull-request author.
     mergeTimeout:
       collaborator: "3.5 days" # defaults to 3.5 days
       contributor: "7 days" # defaults to 7 days
+    repos: 
+      monitor: ["ubiquibot/automated-merging"]
+      ignore: ["ubiquibot/automated-merging"]
+    allowedReviewerRoles: ["COLLABORATOR", "MEMBER", "OWNER"]
 ```
 
 ## Testing

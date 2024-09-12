@@ -1,5 +1,5 @@
 {
   "name": "Automated merging",
   "description": "Automatically merge pull-requests.",
-  "ubiquity:listeners": [ "push", "issue_comment.created" ]
+  "ubiquity:listeners": ["push", "issue_comment.created"]
 }

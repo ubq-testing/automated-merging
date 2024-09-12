@@ -24,25 +24,32 @@ export interface Requirements {
  * statuses, the longest timeout is chosen.
  */
 export async function getMergeTimeoutAndApprovalRequiredCount(context: Context, authorAssociation: string): Promise<Requirements> {
+  const { config: { mergeTimeout, approvalsRequired } } = context;
   const timeoutCollaborator = {
-    mergeTimeout: context.config.mergeTimeout.collaborator,
-    requiredApprovalCount: context.config.approvalsRequired.collaborator,
+    mergeTimeout: mergeTimeout.collaborator,
+    requiredApprovalCount: approvalsRequired.collaborator,
   };
   const timeoutContributor = {
-    mergeTimeout: context.config.mergeTimeout.contributor,
-    requiredApprovalCount: context.config.approvalsRequired.contributor,
+    mergeTimeout: mergeTimeout.contributor,
+    requiredApprovalCount: approvalsRequired.contributor,
   };
+
+  /**
+   * Hardcoded roles here because we need to determine the timeouts
+   * separate from `allowedReviewerRoles` which introduces 
+   * potential unintended user errors and logic issues.
+   */
   return ["COLLABORATOR", "MEMBER", "OWNER"].includes(authorAssociation) ? timeoutCollaborator : timeoutContributor;
 }
 
-export async function getApprovalCount({ octokit, logger }: Context, { owner, repo, issue_number: pullNumber }: IssueParams) {
+export async function getApprovalCount({ octokit, logger, config: { allowedReviewerRoles } }: Context, { owner, repo, issue_number: pullNumber }: IssueParams) {
   try {
     const { data: reviews } = await octokit.rest.pulls.listReviews({
       owner,
       repo,
       pull_number: pullNumber,
     });
-    return reviews.filter((review) => review.state === "APPROVED").length;
+    return reviews.filter((review) => allowedReviewerRoles.includes(review.author_association)).filter((review) => review.state === "APPROVED").length;
   } catch (e) {
     logger.error(`Error fetching reviews' approvals: ${e}`);
     return 0;
