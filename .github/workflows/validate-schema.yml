@@ -19,7 +19,9 @@ jobs:
         with:
           node-version: "20.10.0"
 
-      - name: Install dependencies
+      - name: Install deps and run validation
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn tsx src/validate-schema.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
