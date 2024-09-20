@@ -11,6 +11,7 @@ export function validateAndDecodeSchemas(env: object, rawSettings: object) {
     }
     throw new Error(`Invalid environment provided. ${errors}`);
   }
+
   const envDecoded = Value.Decode(envSchema, env || {});
 
   const settings = Value.Default(pluginSettingsSchema, rawSettings) as PluginSettings;
