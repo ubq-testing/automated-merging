@@ -5,6 +5,8 @@ on:
     inputs:
       settings:
         description: "Settings"
+      after:
+        description: "After SHA"
 
 jobs:
   validate:
