@@ -19,7 +19,7 @@ async function main() {
     }
   }
   console.log("====", finalErrors);
-  await returnDataToKernel(process.env.GITHUB_TOKEN, "", { errors: finalErrors }, "configuration_validation");
+  await returnDataToKernel(process.env.GITHUB_TOKEN, "", { errors: finalErrors, after: payload.after }, "configuration_validation");
 }
 
 main()
