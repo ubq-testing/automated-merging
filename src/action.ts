@@ -11,7 +11,10 @@ export async function run() {
   const payload = github.context.payload.inputs;
 
   payload.env = { ...(payload.env || {}), workflowName: github.context.workflow };
-  const { envDecoded, settingsDecoded } = validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
+  const { envDecoded, settingsDecoded, errors } = validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
+  if (errors) {
+    throw new Error(`Invalid schema detected.`);
+  }
   const inputs: PluginInputs = {
     stateId: payload.stateId,
     eventName: payload.eventName,
