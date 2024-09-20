@@ -26,12 +26,12 @@ export async function run() {
   return returnDataToKernel(process.env.GITHUB_TOKEN, inputs.stateId, {});
 }
 
-async function returnDataToKernel(repoToken: string, stateId: string, output: object) {
+export async function returnDataToKernel(repoToken: string, stateId: string, output: object, eventType = "return_data_to_ubiquibot_kernel") {
   const octokit = new Octokit({ auth: repoToken });
   return octokit.repos.createDispatchEvent({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    event_type: "return_data_to_ubiquibot_kernel",
+    event_type: eventType,
     client_payload: {
       state_id: stateId,
       output: JSON.stringify(output),
