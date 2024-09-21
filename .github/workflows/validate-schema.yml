@@ -3,10 +3,18 @@ name: "Validate Schema"
 on:
   workflow_dispatch:
     inputs:
+      stateId:
+        description: "State Id"
+      eventName:
+        description: "Event Name"
+      eventPayload:
+        description: "Event Payload"
       settings:
         description: "Settings"
-      after:
-        description: "After SHA"
+      authToken:
+        description: "Auth Token"
+      ref:
+        description: "Ref"
 
 jobs:
   validate:
