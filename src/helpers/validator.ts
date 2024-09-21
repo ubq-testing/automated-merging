@@ -9,19 +9,16 @@ export function validateAndDecodeSchemas(env: object, rawSettings: object) {
       console.error(errorMessage);
       errors.push(errorMessage);
     }
-    // throw new Error(`Invalid environment provided. ${errors}`);
   }
   const envDecoded = Value.Decode(envSchema, env || {});
 
   const settings = Value.Default(pluginSettingsSchema, rawSettings) as PluginSettings;
   if (!pluginSettingsValidator.test(settings)) {
-    // const errors: object[] = [];
     for (const error of pluginSettingsValidator.errors(settings)) {
       const errorMessage = { path: error.path, message: error.message, value: error.value };
       console.error(errorMessage);
       errors.push(errorMessage);
     }
-    // throw new Error(`Invalid settings provided.`);
   }
 
   const settingsDecoded = Value.Decode(pluginSettingsSchema, settings);

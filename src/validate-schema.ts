@@ -18,7 +18,6 @@ async function main() {
       finalErrors = [e];
     }
   }
-  console.log("====", finalErrors);
   await returnDataToKernel(process.env.GITHUB_TOKEN, payload.stateId, { errors: finalErrors }, "configuration_validation");
 }
 
