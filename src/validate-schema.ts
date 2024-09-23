@@ -16,13 +16,13 @@ main()
     console.log("Configuration validated.");
     return payload;
   })
-  .catch((e) => {
-    console.error("Failed to validate configuration", e);
-    core.setFailed(e.errors);
-    return e;
+  .catch(({ errors }) => {
+    console.error("Failed to validate configuration", errors);
+    core.setFailed(errors);
+    return errors;
   })
   .then(async (errors) => {
-    console.log("returning data to kernel!", errors);
+    console.log("returning data to kernel! payload is", errors);
     const payload = github.context.payload.inputs;
     await returnDataToKernel(process.env.GITHUB_TOKEN, payload.stateId, errors, "configuration_validation");
   })
