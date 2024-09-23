@@ -9,7 +9,6 @@ export function validateAndDecodeSchemas(env: object, rawSettings: object) {
       errors.push(error);
     }
   }
-  const envDecoded = Value.Decode(envSchema, env || {});
 
   const settings = Value.Default(pluginSettingsSchema, rawSettings) as PluginSettings;
   if (!pluginSettingsValidator.test(settings)) {
@@ -20,6 +19,7 @@ export function validateAndDecodeSchemas(env: object, rawSettings: object) {
   }
 
   const settingsDecoded = Value.Decode(pluginSettingsSchema, settings);
+  const envDecoded = Value.Decode(envSchema, env || {});
 
   return { envDecoded, settingsDecoded, errors };
 }
