@@ -22,7 +22,6 @@ main()
     return errors;
   })
   .then(async (errors) => {
-    console.log("returning data to kernel! payload is", errors);
     const payload = github.context.payload.inputs;
     await returnDataToKernel(process.env.GITHUB_TOKEN, payload.stateId, errors, "configuration_validation");
   })
