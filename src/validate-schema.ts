@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { TransformDecodeCheckError, TransformDecodeError } from "@sinclair/typebox/value";
+import { TransformDecodeCheckError, ValueError } from "@sinclair/typebox/value";
 import { returnDataToKernel } from "./action";
 import { validateAndDecodeSchemas } from "./helpers/validator";
 
@@ -8,25 +8,32 @@ async function main() {
   const payload = github.context.payload.inputs;
 
   payload.env = { ...(payload.env || {}), workflowName: github.context.workflow };
-  let finalErrors;
+  let finalErrors: ValueError[] = [];
   try {
-    const { errors } = validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
-    finalErrors = errors;
+    validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
   } catch (e) {
-    if (e instanceof TransformDecodeCheckError || e instanceof TransformDecodeError) {
+    if (e instanceof TransformDecodeCheckError) {
       finalErrors = [e.error];
     } else {
-      finalErrors = [e];
+      finalErrors = [e as ValueError];
     }
   }
-  await returnDataToKernel(process.env.GITHUB_TOKEN, payload.stateId, { errors: finalErrors }, "configuration_validation");
+  return { payload, errors: finalErrors };
 }
 
 main()
-  .then(() => {
+  .then((payload) => {
     console.log("Configuration validated.");
+    return payload;
   })
   .catch((e) => {
     console.error("Failed to validate configuration", e);
     core.setFailed(e);
+    return e;
+  })
+  .then(async (payload) => {
+    await returnDataToKernel(process.env.GITHUB_TOKEN, payload.stateId, { errors: payload.errors }, "configuration_validation");
+  })
+  .catch((e) => {
+    console.error("Failed to return the data to the kernel.", e);
   });

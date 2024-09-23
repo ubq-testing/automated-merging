@@ -1,8 +1,10 @@
-import { Value, ValueError } from "@sinclair/typebox/value";
-import { envSchema, envValidator, PluginSettings, pluginSettingsSchema, pluginSettingsValidator } from "../types";
+import { TransformDecodeCheckError, TransformDecodeError, Value, ValueError } from "@sinclair/typebox/value";
+import { Env, envSchema, envValidator, PluginSettings, pluginSettingsSchema, pluginSettingsValidator } from "../types";
 
-export function validateAndDecodeSchemas(env: object, rawSettings: object) {
+export function validateAndDecodeSchemas(rawEnv: object, rawSettings: object) {
   const errors: ValueError[] = [];
+
+  const env = Value.Default(envSchema, rawEnv) as Env;
   if (!envValidator.test(env)) {
     for (const error of envValidator.errors(env)) {
       console.error(error);
@@ -18,8 +20,18 @@ export function validateAndDecodeSchemas(env: object, rawSettings: object) {
     }
   }
 
-  const settingsDecoded = Value.Decode(pluginSettingsSchema, settings);
-  const envDecoded = Value.Decode(envSchema, env || {});
+  if (errors.length) {
+    throw { errors };
+  }
 
-  return { envDecoded, settingsDecoded, errors };
+  try {
+    const decodedSettings = Value.Decode(pluginSettingsSchema, settings);
+    const decodedEnv = Value.Decode(envSchema, rawEnv || {});
+    return { decodedEnv, decodedSettings };
+  } catch (e) {
+    if (e instanceof TransformDecodeCheckError || e instanceof TransformDecodeError) {
+      throw { errors: [e.error] };
+    }
+    throw e;
+  }
 }
