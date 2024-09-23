@@ -29,10 +29,11 @@ main()
   })
   .catch((e) => {
     console.error("Failed to validate configuration", e);
-    core.setFailed(e);
+    core.setFailed(e.errors);
     return e;
   })
   .then(async (payload) => {
+    console.log("returning data to kernel!");
     await returnDataToKernel(process.env.GITHUB_TOKEN, payload.stateId, { errors: payload.errors }, "configuration_validation");
   })
   .catch((e) => {
