@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { TransformDecodeCheckError, ValueError } from "@sinclair/typebox/value";
+import { TransformDecodeCheckError, TransformDecodeError } from "@sinclair/typebox/value";
 import { returnDataToKernel } from "./action";
 import { validateAndDecodeSchemas } from "./helpers/validator";
 
@@ -8,18 +8,17 @@ async function main() {
   const payload = github.context.payload.inputs;
 
   payload.env = { ...(payload.env || {}), workflowName: github.context.workflow };
-  let finalErrors: ValueError[] = [];
   try {
     validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
-  } catch (e) {
-    if (e instanceof TransformDecodeCheckError) {
-      finalErrors = [e.error];
+  } catch (errors) {
+    console.error(errors);
+    if (errors instanceof TransformDecodeCheckError || errors instanceof TransformDecodeError) {
+      throw { errors: [errors.error], payload };
     } else {
-      finalErrors = [e as ValueError];
+      throw { errors, payload };
     }
-    throw { errors: finalErrors, payload };
   }
-  return { errors: finalErrors, payload };
+  return { errors: [], payload };
 }
 
 main()
