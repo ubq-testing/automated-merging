@@ -17,8 +17,9 @@ async function main() {
     } else {
       finalErrors = [e as ValueError];
     }
+    throw { errors: finalErrors, payload };
   }
-  return { payload, errors: finalErrors };
+  return { errors: finalErrors, payload };
 }
 
 main()
