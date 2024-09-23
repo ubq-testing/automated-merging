@@ -1,5 +1,6 @@
+import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { TransformDecodeCheckError } from "@sinclair/typebox/value";
+import { TransformDecodeCheckError, TransformDecodeError } from "@sinclair/typebox/value";
 import { returnDataToKernel } from "./action";
 import { validateAndDecodeSchemas } from "./helpers/validator";
 
@@ -12,7 +13,7 @@ async function main() {
     const { errors } = validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
     finalErrors = errors;
   } catch (e) {
-    if (e instanceof TransformDecodeCheckError) {
+    if (e instanceof TransformDecodeCheckError || e instanceof TransformDecodeError) {
       finalErrors = [e.error];
     } else {
       finalErrors = [e];
@@ -27,4 +28,5 @@ main()
   })
   .catch((e) => {
     console.error("Failed to validate configuration", e);
+    core.setFailed(e);
   });
