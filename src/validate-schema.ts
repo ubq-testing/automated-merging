@@ -16,7 +16,7 @@ main()
     console.log("Configuration validated.");
     return payload;
   })
-  .catch(({ errors }) => {
+  .catch((errors) => {
     console.error("Failed to validate configuration", errors);
     core.setFailed(errors);
     return errors;
