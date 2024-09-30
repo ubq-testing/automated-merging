@@ -27,7 +27,6 @@
         "required": ["monitor", "ignore"]
       },
       "allowedReviewerRoles": { "default": ["COLLABORATOR", "MEMBER", "OWNER"], "type": "array", "items": { "type": "string" } }
-    },
-    "required": ["approvalsRequired", "mergeTimeout", "repos", "allowedReviewerRoles"]
+    }
   }
 }
