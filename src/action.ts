@@ -11,7 +11,6 @@ export async function run() {
   const payload = github.context.payload.inputs;
 
   payload.env = { ...(payload.env || {}), workflowName: github.context.workflow };
-  console.log("PAYLOAD", JSON.stringify(payload, null, 2));
   const { decodedSettings, decodedEnv } = validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
   const inputs: PluginInputs = {
     stateId: payload.stateId,
