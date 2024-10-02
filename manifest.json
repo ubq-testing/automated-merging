@@ -1,32 +1,8 @@
 {
   "name": "Automated merging",
   "description": "Automatically merge pull-requests.",
-  "ubiquity:listeners": ["push", "issue_comment.created"],
-  "configuration": {
-    "type": "object",
-    "properties": {
-      "approvalsRequired": {
-        "default": {},
-        "type": "object",
-        "properties": { "collaborator": { "default": 1, "minimum": 1, "type": "number" }, "contributor": { "default": 2, "minimum": 1, "type": "number" } },
-        "required": ["collaborator", "contributor"]
-      },
-      "mergeTimeout": {
-        "default": {},
-        "type": "object",
-        "properties": { "collaborator": { "default": "3.5 days", "type": "string" }, "contributor": { "default": "7 days", "type": "string" } },
-        "required": ["collaborator", "contributor"]
-      },
-      "repos": {
-        "default": {},
-        "type": "object",
-        "properties": {
-          "monitor": { "default": [], "type": "array", "items": { "minLength": 1, "type": "string" } },
-          "ignore": { "default": [], "type": "array", "items": { "type": "string" } }
-        },
-        "required": ["monitor", "ignore"]
-      },
-      "allowedReviewerRoles": { "default": ["COLLABORATOR", "MEMBER", "OWNER"], "type": "array", "items": { "type": "string" } }
-    }
-  }
+  "ubiquity:listeners": [
+    "push",
+    "issue_comment.created"
+  ]
 }
