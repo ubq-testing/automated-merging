@@ -21,7 +21,31 @@ jobs:
       - name: Install deps and run configuration update
         run: |
           yarn install --immutable --immutable-cache --check-cache
-          yarn tsx src/update-configuration.ts
+
+      - name: Update manifest configuration using GitHub Script
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Load the plugin settings schema from the types file
+            const { pluginSettingsSchema } = require('./src/types');
+
+            // Read and parse the manifest file
+            const manifestPath = path.resolve(__dirname, './manifest.json');
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+            // Stringify the plugin settings schema and add it to the manifest
+            const configuration = JSON.stringify(pluginSettingsSchema);
+            console.log('Updated configuration:', configuration);
+
+            // Add or update the configuration key in the manifest
+            manifest["configuration"] = JSON.parse(configuration);
+
+            // Write the updated manifest back to the file
+            fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+            console.log('Manifest updated successfully');
 
       - name: Commit and Push generated types
         run: |
