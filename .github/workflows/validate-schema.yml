@@ -34,7 +34,7 @@ jobs:
             const { pluginSettingsSchema } = require('./src/types');
 
             // Read and parse the manifest file
-            const manifestPath = path.resolve(__dirname, './manifest.json');
+            const manifestPath = path.resolve(${{ github.workspace }}, './manifest.json');
             const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
             // Stringify the plugin settings schema and add it to the manifest
