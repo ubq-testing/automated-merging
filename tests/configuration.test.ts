@@ -32,6 +32,9 @@ describe("Configuration tests", () => {
               pull_request: {
                 html_url: "https://github.com/ubiquibot/automated-merging/pull/1",
               },
+              env: {
+                workflowName: "workflow",
+              },
             }),
             env: {
               workflowName: "workflow",
@@ -41,8 +44,31 @@ describe("Configuration tests", () => {
       },
     }));
     const run = (await import("../src/action")).run;
-    await expect(run()).rejects.toThrow(
-      "Invalid settings provided:\n/approvalsRequired/collaborator: Expected number to be greater or equal to 1;\n/approvalsRequired/contributor: Expected number to be greater or equal to 1"
-    );
+    await expect(run()).rejects.toMatchObject({
+      errors: [
+        {
+          message: "Expected number to be greater or equal to 1",
+          path: "/approvalsRequired/collaborator",
+          schema: {
+            default: 1,
+            minimum: 1,
+            type: "number",
+          },
+          type: 39,
+          value: 0,
+        },
+        {
+          message: "Expected number to be greater or equal to 1",
+          path: "/approvalsRequired/contributor",
+          schema: {
+            default: 2,
+            minimum: 1,
+            type: "number",
+          },
+          type: 39,
+          value: 0,
+        },
+      ],
+    });
   });
 });
