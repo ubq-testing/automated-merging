@@ -5,8 +5,8 @@ on:
   push:
 
 jobs:
-  validate:
-    name: "Validate Schema"
+  update:
+    name: "Update Configuration in manifest.json"
     runs-on: ubuntu-latest
     permissions: write-all
 
@@ -30,23 +30,18 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            // Load the plugin settings schema from the types file
             const { pluginSettingsSchema } = require('./src/types');
 
-            // Read and parse the manifest file
             const manifestPath = path.resolve("${{ github.workspace }}", './manifest.json');
             const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
-            // Stringify the plugin settings schema and add it to the manifest
             const configuration = JSON.stringify(pluginSettingsSchema);
-            console.log('Updated configuration:', configuration);
 
-            // Add or update the configuration key in the manifest
             manifest["configuration"] = JSON.parse(configuration);
 
-            // Write the updated manifest back to the file
-            fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-            console.log('Manifest updated successfully');
+            const updatedManifest = JSON.stringify(manifest, null, 2)
+            console.log('Updated manifest:', updatedManifest);
+            fs.writeFileSync(manifestPath, updatedManifest);
 
       - name: Commit and Push generated types
         run: |
