@@ -55,18 +55,20 @@ export const reposSchema = T.Object(
   { default: {} }
 );
 
-const allowedReviewerRoles = T.Array(T.String(), { default: ["COLLABORATOR", "MEMBER", "OWNER"] })
+const allowedReviewerRoles = T.Array(T.String(), { default: ["COLLABORATOR", "MEMBER", "OWNER"] });
 
 export const pluginSettingsSchema = T.Object({
-  approvalsRequired: approvalsRequiredSchema,
-  mergeTimeout: mergeTimeoutSchema,
+  approvalsRequired: T.Optional(approvalsRequiredSchema),
+  mergeTimeout: T.Optional(mergeTimeoutSchema),
   /**
    * The list of organizations or repositories to watch for updates.
    */
-  repos: reposSchema,
-  allowedReviewerRoles: T.Transform(allowedReviewerRoles)
-    .Decode((roles) => roles.map((role) => role.toUpperCase()))
-    .Encode((roles) => roles.map((role) => role.toUpperCase()))
+  repos: T.Optional(reposSchema),
+  allowedReviewerRoles: T.Optional(
+    T.Transform(allowedReviewerRoles)
+      .Decode((roles) => roles.map((role) => role.toUpperCase()))
+      .Encode((roles) => roles.map((role) => role.toUpperCase()))
+  ),
 });
 
 export const pluginSettingsValidator = new StandardValidator(pluginSettingsSchema);

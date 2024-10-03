@@ -11,27 +11,27 @@ export async function run() {
   const payload = github.context.payload.inputs;
 
   payload.env = { ...(payload.env || {}), workflowName: github.context.workflow };
-  const { envDecoded, settingsDecoded } = validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
+  const { decodedSettings, decodedEnv } = validateAndDecodeSchemas(payload.env, JSON.parse(payload.settings));
   const inputs: PluginInputs = {
     stateId: payload.stateId,
     eventName: payload.eventName,
     eventPayload: JSON.parse(payload.eventPayload),
-    settings: settingsDecoded,
+    settings: decodedSettings,
     authToken: payload.authToken,
     ref: payload.ref,
   };
 
-  await plugin(inputs, envDecoded);
+  await plugin(inputs, decodedEnv);
 
   return returnDataToKernel(process.env.GITHUB_TOKEN, inputs.stateId, {});
 }
 
-async function returnDataToKernel(repoToken: string, stateId: string, output: object) {
+export async function returnDataToKernel(repoToken: string, stateId: string, output: object, eventType = "return_data_to_ubiquibot_kernel") {
   const octokit = new Octokit({ auth: repoToken });
   return octokit.repos.createDispatchEvent({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    event_type: "return_data_to_ubiquibot_kernel",
+    event_type: eventType,
     client_payload: {
       state_id: stateId,
       output: JSON.stringify(output),

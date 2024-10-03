@@ -9,7 +9,7 @@ export interface ResultInfo {
 
 function generateGitHubSummary(context: Context, urls: ResultInfo[]): string {
   const target = `https://github.com/${context.payload.repository.owner?.login}`;
-  const output: string[] = ["## Merge report\n\n"];
+  const output: (string | undefined)[] = ["## Merge report\n\n"];
   output.push("<samp>\n");
   output.push("| Merged | ID |");
   output.push("|---|---|");
@@ -29,9 +29,9 @@ function generateGitHubSummary(context: Context, urls: ResultInfo[]): string {
   output.push("\n</samp>\n");
   output.push("## Configuration\n\n");
   output.push("### Watching Repositories\n\n");
-  output.push(context.config.repos.monitor.map((o) => `- [${o}](${target}/${o})`).join("\n"));
+  output.push(context.config.repos?.monitor.map((o) => `- [${o}](${target}/${o})`).join("\n"));
   output.push("### Ignored Repositories\n\n");
-  output.push(context.config.repos.ignore.map((o) => `- [${o}](${target}/${o})`).join("\n"));
+  output.push(context.config.repos?.ignore.map((o) => `- [${o}](${target}/${o})`).join("\n"));
   return output.join("\n");
 }
 

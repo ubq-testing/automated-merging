@@ -2,7 +2,7 @@ import { RestEndpointMethodTypes } from "@octokit/rest";
 import ms from "ms";
 import { getAllTimelineEvents } from "../handlers/github-events";
 import { generateSummary, ResultInfo } from "../handlers/summary";
-import { Context } from "../types";
+import { Context, ReposWatchSettings } from "../types";
 import {
   getApprovalCount,
   getMergeTimeoutAndApprovalRequiredCount,
@@ -30,7 +30,7 @@ export async function updatePullRequests(context: Context) {
   const { logger } = context;
   const results: ResultInfo[] = [];
 
-  if (!context.config.repos.monitor.length) {
+  if (!context.config.repos?.monitor.length) {
     const owner = context.payload.repository.owner;
     if (owner) {
       logger.info(`No organizations or repo have been specified, will default to the organization owner: ${owner.login}.`);
@@ -39,7 +39,7 @@ export async function updatePullRequests(context: Context) {
     }
   }
 
-  const pullRequests = await getOpenPullRequests(context, context.config.repos);
+  const pullRequests = await getOpenPullRequests(context, context.config.repos as ReposWatchSettings);
 
   if (!pullRequests?.length) {
     return logger.info("Nothing to do.");
@@ -74,8 +74,14 @@ export async function updatePullRequests(context: Context) {
       );
       if (isNaN(lastActivityDate.getTime())) {
         logger.info(`PR ${html_url} does not seem to have any activity, nothing to do.`);
-      } else if (isPastOffset(lastActivityDate, requirements.mergeTimeout)) {
-        isMerged = await attemptMerging(context, { gitHubUrl, htmlUrl: html_url, requirements, lastActivityDate, pullRequestDetails });
+      } else if (requirements?.mergeTimeout && isPastOffset(lastActivityDate, requirements?.mergeTimeout)) {
+        isMerged = await attemptMerging(context, {
+          gitHubUrl,
+          htmlUrl: html_url,
+          requirements: requirements as Requirements,
+          lastActivityDate,
+          pullRequestDetails,
+        });
       } else {
         logger.info(`PR ${html_url} has activity up until (${lastActivityDate}), nothing to do.`);
       }
