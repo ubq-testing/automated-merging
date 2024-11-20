@@ -35,14 +35,15 @@ export async function updatePullRequests(context: Context) {
     if (owner) {
       logger.info(`No organizations or repo have been specified, will default to the organization owner: ${owner.login}.`);
     } else {
-      return logger.error("Could not set a default organization to watch, skipping.");
+      throw logger.error("Could not set a default organization to watch, skipping.");
     }
   }
 
   const pullRequests = await getOpenPullRequests(context, context.config.repos as ReposWatchSettings);
 
   if (!pullRequests?.length) {
-    return logger.info("Nothing to do.");
+    logger.info("Nothing to do.");
+    return;
   }
 
   for (const { html_url } of pullRequests) {
@@ -56,6 +57,7 @@ export async function updatePullRequests(context: Context) {
         continue;
       }
       const activity = await getAllTimelineEvents(context, parseGitHubUrl(html_url));
+      console.log(activity);
       const eventDates: Date[] = activity.reduce<Date[]>((acc, event) => {
         if (isIssueEvent(event)) {
           const date = new Date(event.created_at || event.updated_at || event.timestamp || event.commented_at || "");

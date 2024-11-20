@@ -173,6 +173,7 @@ export async function getOpenPullRequests(context: Context, targets: ReposWatchS
 }
 
 export async function mergePullRequest(context: Context, { repo, owner, issue_number: pullNumber }: IssueParams) {
+  console.log("merging PR");
   await context.octokit.rest.pulls.merge({
     owner,
     repo,
