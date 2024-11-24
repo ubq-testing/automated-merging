@@ -1,5 +1,4 @@
 import { drop } from "@mswjs/data";
-import { Octokit } from "@octokit/rest";
 import { http, HttpResponse } from "msw";
 import * as githubHelpers from "../src/helpers/github";
 import { db } from "./__mocks__/db";
@@ -9,6 +8,7 @@ import { Context, pluginSettingsSchema } from "../src/types";
 import seed from "./__mocks__/seed.json";
 import { Logs } from "@ubiquity-os/ubiquity-os-logger";
 import { Value } from "@sinclair/typebox/value";
+import { customOctokit as Octokit } from "@ubiquity-os/plugin-sdk/octokit";
 
 const mergePullRequest = jest.fn();
 

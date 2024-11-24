@@ -1,4 +1,4 @@
-import { RestEndpointMethodTypes } from "@octokit/rest";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 import ms from "ms";
 import { getAllTimelineEvents } from "../handlers/github-events";
 import { generateSummary, ResultInfo } from "../handlers/summary";
