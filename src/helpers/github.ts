@@ -31,17 +31,13 @@ export async function getMergeTimeoutAndApprovalRequiredCount(context: Context, 
     mergeTimeout: mergeTimeout?.collaborator,
     requiredApprovalCount: approvalsRequired?.collaborator,
   };
-  const timeoutContributor = {
-    mergeTimeout: mergeTimeout?.contributor,
-    requiredApprovalCount: approvalsRequired?.contributor,
-  };
 
   /**
    * Hardcoded roles here because we need to determine the timeouts
    * separate from `allowedReviewerRoles` which introduces
    * potential unintended user errors and logic issues.
    */
-  return ["COLLABORATOR", "MEMBER", "OWNER"].includes(authorAssociation) ? timeoutCollaborator : timeoutContributor;
+  return ["COLLABORATOR", "MEMBER", "OWNER"].includes(authorAssociation) ? timeoutCollaborator : null;
 }
 
 export async function getApprovalCount({ octokit, logger, config: { allowedReviewerRoles } }: Context, { owner, repo, issue_number: pullNumber }: IssueParams) {
