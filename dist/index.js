@@ -32504,7 +32504,6 @@ async function getOpenPullRequests(e, t) {
   }
 }
 async function mergePullRequest(e, { repo: t, owner: r, issue_number: s }) {
-  console.log("merging PR");
   await e.octokit.rest.pulls.merge({ owner: r, repo: t, pull_number: s });
 }
 async function getPullRequestDetails(e, { repo: t, owner: r, issue_number: s }) {
@@ -32576,7 +32575,6 @@ async function updatePullRequests(e) {
         continue;
       }
       const A = await getAllTimelineEvents(e, parseGitHubUrl(o));
-      console.log(A);
       const i = A.reduce((e, t) => {
         if (isIssueEvent(t)) {
           const r = new Date(t.created_at || t.updated_at || t.timestamp || t.commented_at || "");
