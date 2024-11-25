@@ -1,10 +1,7 @@
 {
   "name": "Automated merging",
   "description": "Automatically merge pull-requests.",
-  "ubiquity:listeners": [
-    "push",
-    "issue_comment.created"
-  ],
+  "ubiquity:listeners": ["push", "issue_comment.created"],
   "configuration": {
     "type": "object",
     "properties": {
@@ -22,11 +19,7 @@
             "minimum": 1,
             "type": "number"
           }
-        },
-        "required": [
-          "collaborator",
-          "contributor"
-        ]
+        }
       },
       "mergeTimeout": {
         "default": {},
@@ -34,17 +27,10 @@
         "properties": {
           "collaborator": {
             "default": "3.5 days",
-            "type": "string"
-          },
-          "contributor": {
-            "default": "7 days",
+            "description": "The timespan to wait before merging a collaborator's pull-request",
             "type": "string"
           }
-        },
-        "required": [
-          "collaborator",
-          "contributor"
-        ]
+        }
       },
       "repos": {
         "default": {},
@@ -65,18 +51,10 @@
               "type": "string"
             }
           }
-        },
-        "required": [
-          "monitor",
-          "ignore"
-        ]
+        }
       },
       "allowedReviewerRoles": {
-        "default": [
-          "COLLABORATOR",
-          "MEMBER",
-          "OWNER"
-        ],
+        "default": ["COLLABORATOR", "MEMBER", "OWNER"],
         "type": "array",
         "items": {
           "type": "string"
