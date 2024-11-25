@@ -36,4 +36,4 @@ jobs:
         uses: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PLUGIN_GITHUB_TOKEN: ${{ secrets.PLUGIN_GITHUB_TOKEN }}
+          PLUGIN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
