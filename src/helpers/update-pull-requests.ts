@@ -1,4 +1,4 @@
-import { RestEndpointMethodTypes } from "@octokit/rest";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 import ms from "ms";
 import { getAllTimelineEvents } from "../handlers/github-events";
 import { generateSummary, ResultInfo } from "../handlers/summary";
@@ -35,14 +35,15 @@ export async function updatePullRequests(context: Context) {
     if (owner) {
       logger.info(`No organizations or repo have been specified, will default to the organization owner: ${owner.login}.`);
     } else {
-      return logger.error("Could not set a default organization to watch, skipping.");
+      throw logger.error("Could not set a default organization to watch, skipping.");
     }
   }
 
   const pullRequests = await getOpenPullRequests(context, context.config.repos as ReposWatchSettings);
 
   if (!pullRequests?.length) {
-    return logger.info("Nothing to do.");
+    logger.info("Nothing to do.");
+    return;
   }
 
   for (const { html_url } of pullRequests) {
