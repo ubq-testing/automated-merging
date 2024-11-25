@@ -26,5 +26,5 @@ on the association of the pull-request author.
 ## Testing
 
 ```shell
-yarn test
+bun test
 ```
