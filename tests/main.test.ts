@@ -151,10 +151,7 @@ describe("Action tests", () => {
         { once: true }
       )
     );
-    await expect(githubHelpers.getMergeTimeoutAndApprovalRequiredCount(context, "CONTRIBUTOR")).resolves.toEqual({
-      mergeTimeout: contributorMergeTimeout,
-      requiredApprovalCount: contributorMinimumApprovalsRequired,
-    });
+    await expect(githubHelpers.getMergeTimeoutAndApprovalRequiredCount(context, "CONTRIBUTOR")).resolves.toEqual(null);
   });
 
   it("Should check if the CI tests are all passing", async () => {

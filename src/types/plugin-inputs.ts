@@ -21,11 +21,7 @@ export const mergeTimeoutSchema = T.Object(
     /**
      * The timespan to wait before merging a collaborator's pull-request, defaults to 3.5 days.
      */
-    collaborator: T.String({ default: "3.5 days" }),
-    /**
-     * The timespan to wait before merging a contributor's pull-request, defaults to 7 days.
-     */
-    contributor: T.String({ default: "7 days" }),
+    collaborator: T.String({ default: "3.5 days", description: "The timespan to wait before merging a collaborator's pull-request" }),
   },
   { default: {} }
 );
