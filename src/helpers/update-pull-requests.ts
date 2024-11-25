@@ -57,7 +57,6 @@ export async function updatePullRequests(context: Context) {
         continue;
       }
       const activity = await getAllTimelineEvents(context, parseGitHubUrl(html_url));
-      console.log(activity);
       const eventDates: Date[] = activity.reduce<Date[]>((acc, event) => {
         if (isIssueEvent(event)) {
           const date = new Date(event.created_at || event.updated_at || event.timestamp || event.commented_at || "");
