@@ -1,6 +1,6 @@
 import { Context as PluginContext } from "@ubiquity-os/plugin-sdk";
 import { Env } from "./env";
-import { PluginSettings } from "./plugin-inputs";
+import { PluginSettings } from "./plugin-input";
 
 export type SupportedEvents = "push" | "issue_comment.created";
 
