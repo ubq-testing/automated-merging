@@ -32364,13 +32364,36 @@ async function returnDataToKernel(e, t, r) {
 }
 var Bt = __nccwpck_require__(2874);
 const yt = w.Object({ workflowName: w.String() });
-const bt = w.Object({ collaborator: w.Number({ default: 1, minimum: 1 }), contributor: w.Number({ default: 2, minimum: 1 }) }, { default: {} });
+const bt = w.Object(
+  {
+    collaborator: w.Number({
+      default: 1,
+      minimum: 1,
+      description: "The amount of validations needed to consider a pull-request by a collaborator to be deemed eligible for merge",
+    }),
+    contributor: w.Number({
+      default: 2,
+      minimum: 1,
+      description: "The amount of validations needed to consider a pull-request by a contributor to be deemed eligible for merge",
+    }),
+  },
+  { default: {} }
+);
 const wt = w.Object(
   { collaborator: w.String({ default: "3.5 days", description: "The timespan to wait before merging a collaborator's pull-request" }) },
   { default: {} }
 );
-const Rt = w.Object({ monitor: w.Array(w.String({ minLength: 1 }), { default: [] }), ignore: w.Array(w.String(), { default: [] }) }, { default: {} });
-const Tt = w.Array(w.String(), { default: ["COLLABORATOR", "MEMBER", "OWNER"] });
+const Rt = w.Object(
+  {
+    monitor: w.Array(w.String({ minLength: 1 }), { default: [], description: "Repositories to watch for updates" }),
+    ignore: w.Array(w.String(), { default: [], description: "Repositories to ignore updates from" }),
+  },
+  { default: {} }
+);
+const Tt = w.Array(w.String(), {
+  default: ["COLLABORATOR", "MEMBER", "OWNER"],
+  description: "When considering a user for a task: which roles should be considered as having review authority? All others are ignored.",
+});
 const kt = w.Object({
   approvalsRequired: w.Optional(bt),
   mergeTimeout: w.Optional(wt),
