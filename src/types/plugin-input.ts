@@ -6,12 +6,12 @@ export const approvalsRequiredSchema = T.Object(
      * The amount of validations needed to consider a pull-request by a collaborator to be deemed eligible for
      * merge, defaults to 1.
      */
-    collaborator: T.Number({ default: 1, minimum: 1 }),
+    collaborator: T.Number({ default: 1, minimum: 1, description: "The amount of validations needed to consider a pull-request by a collaborator to be deemed eligible for merge" }),
     /**
      * The amount of validations needed to consider a pull-request by a contributor to be deemed eligible for merge,
      * defaults to 2.
      */
-    contributor: T.Number({ default: 2, minimum: 1 }),
+    contributor: T.Number({ default: 2, minimum: 1, description: "The amount of validations needed to consider a pull-request by a contributor to be deemed eligible for merge" }),
   },
   { default: {} }
 );
@@ -31,16 +31,16 @@ export const reposSchema = T.Object(
     /**
      * Repositories to watch for updates
      */
-    monitor: T.Array(T.String({ minLength: 1 }), { default: [] }),
+    monitor: T.Array(T.String({ minLength: 1 }), { default: [], description: "Repositories to watch for updates" }),
     /**
      * Repositories to ignore updates from
      */
-    ignore: T.Array(T.String(), { default: [] }),
+    ignore: T.Array(T.String(), { default: [], description: "Repositories to ignore updates from" }),
   },
   { default: {} }
 );
 
-const allowedReviewerRoles = T.Array(T.String(), { default: ["COLLABORATOR", "MEMBER", "OWNER"] });
+const allowedReviewerRoles = T.Array(T.String(), { default: ["COLLABORATOR", "MEMBER", "OWNER"], description: "When considering a user for a task: which roles should be considered as having review authority? All others are ignored." });
 
 export const pluginSettingsSchema = T.Object({
   approvalsRequired: T.Optional(approvalsRequiredSchema),
