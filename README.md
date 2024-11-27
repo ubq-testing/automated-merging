@@ -17,7 +17,7 @@ on the association of the pull-request author.
     mergeTimeout:
       collaborator: "3.5 days" # defaults to 3.5 days
       contributor: "7 days" # defaults to 7 days
-    repos: 
+    repos:
       monitor: ["ubiquibot/automated-merging"]
       ignore: ["ubiquibot/automated-merging"]
     allowedReviewerRoles: ["COLLABORATOR", "MEMBER", "OWNER"]
