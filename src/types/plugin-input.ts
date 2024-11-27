@@ -21,7 +21,11 @@ export const mergeTimeoutSchema = T.Object(
     /**
      * The timespan to wait before merging a collaborator's pull-request, defaults to 3.5 days.
      */
-    collaborator: T.String({ default: "3.5 days", description: "The timespan to wait before merging a collaborator's pull-request" }),
+    collaborator: T.String({
+      default: "3.5 days",
+      description: "The timespan to wait before merging a collaborator's pull-request",
+      examples: ["1 day", "3.5 days"]
+    }),
   },
   { default: {} }
 );
@@ -31,16 +35,28 @@ export const reposSchema = T.Object(
     /**
      * Repositories to watch for updates
      */
-    monitor: T.Array(T.String({ minLength: 1 }), { default: [], description: "Repositories to watch for updates" }),
+    monitor: T.Array(T.String({ minLength: 1 }), {
+      default: [],
+      description: "Repositories to watch for updates, if empty all are watched and if just owner is provided all repositories from that owner are watched.",
+      examples: ["owner/repo", "owner"]
+    }),
     /**
      * Repositories to ignore updates from
      */
-    ignore: T.Array(T.String(), { default: [], description: "Repositories to ignore updates from" }),
+    ignore: T.Array(T.String(), {
+      default: [],
+      description: "Repositories to ignore updates from, if empty all repositories are watched and if just owner is provided all repositories from that owner are ignored",
+      examples: ["owner/repo", "owner"]
+    }),
   },
   { default: {} }
 );
 
-const allowedReviewerRoles = T.Array(T.String(), { default: ["COLLABORATOR", "MEMBER", "OWNER"], description: "When considering a user for a task: which roles should be considered as having review authority? All others are ignored." });
+const allowedReviewerRoles = T.Array(T.String(), {
+  default: ["COLLABORATOR", "MEMBER", "OWNER"],
+  description: "When considering a user for a task: which roles should be considered as having review authority? All others are ignored.",
+  examples: [["COLLABORATOR", "MEMBER", "OWNER"], ["MEMBER", "OWNER"]]
+});
 
 export const pluginSettingsSchema = T.Object({
   approvalsRequired: T.Optional(approvalsRequiredSchema),
