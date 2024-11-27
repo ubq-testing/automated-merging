@@ -25,6 +25,7 @@ jobs:
     name: "Automated Merging"
     runs-on: ubuntu-latest
     permissions: write-all
+    environment: ${{ github.ref == 'refs/heads/main' && 'main' || 'development' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,5 +36,6 @@ jobs:
       - name: Execute directive
         uses: ./
         env:
+          KERNEL_PUBLIC_KEY: ${{ secrets.KERNEL_PUBLIC_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PLUGIN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
