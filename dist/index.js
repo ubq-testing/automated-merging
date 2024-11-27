@@ -32380,19 +32380,38 @@ const bt = w.Object(
   { default: {} }
 );
 const wt = w.Object(
-  { collaborator: w.String({ default: "3.5 days", description: "The timespan to wait before merging a collaborator's pull-request" }) },
+  {
+    collaborator: w.String({
+      default: "3.5 days",
+      description: "The timespan to wait before merging a collaborator's pull-request",
+      examples: ["1 day", "3.5 days"],
+    }),
+  },
   { default: {} }
 );
 const Rt = w.Object(
   {
-    monitor: w.Array(w.String({ minLength: 1 }), { default: [], description: "Repositories to watch for updates" }),
-    ignore: w.Array(w.String(), { default: [], description: "Repositories to ignore updates from" }),
+    monitor: w.Array(w.String({ minLength: 1 }), {
+      default: [],
+      description: "Repositories to watch for updates, if empty all are watched and if just owner is provided all repositories from that owner are watched.",
+      examples: ["owner/repo", "owner"],
+    }),
+    ignore: w.Array(w.String(), {
+      default: [],
+      description:
+        "Repositories to ignore updates from, if empty all repositories are watched and if just owner is provided all repositories from that owner are ignored",
+      examples: ["owner/repo", "owner"],
+    }),
   },
   { default: {} }
 );
 const Tt = w.Array(w.String(), {
   default: ["COLLABORATOR", "MEMBER", "OWNER"],
   description: "When considering a user for a task: which roles should be considered as having review authority? All others are ignored.",
+  examples: [
+    ["COLLABORATOR", "MEMBER", "OWNER"],
+    ["MEMBER", "OWNER"],
+  ],
 });
 const kt = w.Object({
   approvalsRequired: w.Optional(bt),

@@ -30,6 +30,7 @@
           "collaborator": {
             "default": "3.5 days",
             "description": "The timespan to wait before merging a collaborator's pull-request",
+            "examples": ["1 day", "3.5 days"],
             "type": "string"
           }
         }
@@ -40,7 +41,8 @@
         "properties": {
           "monitor": {
             "default": [],
-            "description": "Repositories to watch for updates",
+            "description": "Repositories to watch for updates, if empty all are watched and if just owner is provided all repositories from that owner are watched.",
+            "examples": ["owner/repo", "owner"],
             "type": "array",
             "items": {
               "minLength": 1,
@@ -49,7 +51,8 @@
           },
           "ignore": {
             "default": [],
-            "description": "Repositories to ignore updates from",
+            "description": "Repositories to ignore updates from, if empty all repositories are watched and if just owner is provided all repositories from that owner are ignored",
+            "examples": ["owner/repo", "owner"],
             "type": "array",
             "items": {
               "type": "string"
@@ -60,6 +63,10 @@
       "allowedReviewerRoles": {
         "default": ["COLLABORATOR", "MEMBER", "OWNER"],
         "description": "When considering a user for a task: which roles should be considered as having review authority? All others are ignored.",
+        "examples": [
+          ["COLLABORATOR", "MEMBER", "OWNER"],
+          ["MEMBER", "OWNER"]
+        ],
         "type": "array",
         "items": {
           "type": "string"
