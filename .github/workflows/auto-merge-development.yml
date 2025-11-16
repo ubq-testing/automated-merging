@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  TARGET_ORGS: '["ubiquity", "ubiquity-os", "ubiquity-os-marketplace", "ubiquity-research", "devpool-directory"]'
+  TARGET_ORGS: '["ubq-testing"]'
   INACTIVITY_DAYS: "90"
 
 jobs:
