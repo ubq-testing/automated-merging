@@ -4,17 +4,17 @@ import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
-import { normalizePrivateKey } from "./utils";
+import { logger, normalizePrivateKey } from "./utils";
 import { BranchData, Octokit, RepositoryInfo } from "./types";
 
 export const customOctokit = Core.plugin(retry, throttling, restEndpointMethods, paginateRest).defaults({
   throttle: {
     onRateLimit: (retryAfter: number, options: { method?: string; url?: string }) => {
-      console.warn(`[GitHub] Rate limit hit for ${options.method ?? "GET"} ${options.url}. Retrying in ${retryAfter}s`);
+      logger.warn(`[GitHub] Rate limit hit for ${options.method ?? "GET"} ${options.url}. Retrying in ${retryAfter}s`);
       return true;
     },
     onSecondaryRateLimit: (retryAfter: number, options: { method?: string; url?: string }) => {
-      console.warn(`[GitHub] Secondary rate limit for ${options.method ?? "GET"} ${options.url}. Retrying in ${retryAfter}s`);
+      logger.warn(`[GitHub] Secondary rate limit for ${options.method ?? "GET"} ${options.url}. Retrying in ${retryAfter}s`);
       return true;
     },
   },
@@ -46,7 +46,9 @@ export async function authenticateOrganization(appClient: Octokit, org: string, 
       },
     });
   } catch (error) {
-    console.error(`[Auto-Merge] Failed to authenticate for org ${org}:`, error instanceof Error ? error.message : String(error));
+    logger.error(`[Auto-Merge] Failed to authenticate for org ${org}:`, {
+      e: error,
+    });
     throw error;
   }
 }
@@ -61,7 +63,7 @@ export async function listOrgRepos(octokit: Octokit, org: string): Promise<Repos
       per_page: 100,
     });
   } catch (error) {
-    console.error(`[Auto-Merge] Failed to list repos for ${org}:`, error instanceof Error ? error.message : String(error));
+    logger.error(`[Auto-Merge] Failed to list repos for ${org}:`, { e: error });
     return null;
   }
 }
@@ -88,7 +90,7 @@ export async function getDefaultBranch({
     });
     return data as BranchData;
   } catch (error) {
-    console.error(`[Auto-Merge] Failed to get default branch for ${owner}/${repo}:`, error instanceof Error ? error.message : String(error));
+    logger.error(`[Auto-Merge] Failed to get default branch for ${owner}/${repo}:`, { e: error });
     return null;
   }
 }
@@ -160,18 +162,28 @@ export async function createMainBranch({
       sha: devSha,
     });
 
-    console.log(`[Auto-Merge] Created main branch for ${org}/${repoName} from ${defaultBranch}`);
+    logger.info(`[Auto-Merge] Created main branch for ${org}/${repoName} from ${defaultBranch}`);
   }
 }
 
-export async function openPullRequest(octokit: Octokit, org: string, repoName: string): Promise<void> {
+export async function openPullRequest({
+  octokit,
+  org,
+  repoName,
+  defaultBranch,
+}: {
+  octokit: Octokit;
+  org: string;
+  repoName: string;
+  defaultBranch: string;
+}): Promise<void> {
   await octokit.rest.pulls.create({
     owner: org,
     repo: repoName,
-    title: "Merge development into main",
-    head: "development",
+    title: `Merge ${defaultBranch} into main`,
+    head: defaultBranch,
     base: "main",
-    body: "Automated PR to merge development into main branch.",
+    body: `Automated PR to merge ${defaultBranch} into main branch.`,
   });
-  console.log(`[Auto-Merge] Opened pull request for ${org}/${repoName} to merge development into main`);
+  logger.info(`[Auto-Merge] Opened pull request for ${org}/${repoName} to merge ${defaultBranch} into main`);
 }

@@ -1,6 +1,6 @@
 import { authenticateOrganization, createAppClient, createMainBranch, getDefaultBranch, listOrgRepos, mergeDefaultIntoMain, openPullRequest } from "./github";
 import { forkSafetyGuard } from "./guards";
-import { firstValidTimestamp } from "./utils";
+import { firstValidTimestamp, logger } from "./utils";
 import { AutoMergeOptions, AutoMergeResult, BranchData, MergeOutcome, Octokit, RepositoryInfo } from "./types";
 export type { MergeOutcome } from "./types";
 
@@ -37,7 +37,7 @@ export async function runAutoMerge(options: AutoMergeOptions): Promise<AutoMerge
     }
   }
 
-  console.log(`[Auto-Merge] Completed: ${outcomes.length} outcomes, ${errors} errors`);
+  logger.info(`[Auto-Merge] Completed: ${outcomes.length} outcomes, ${errors} errors`);
   return { outcomes, errors };
 }
 
@@ -51,7 +51,7 @@ async function processOrganization(
   cutoffTime: number,
   inactivityDays: number
 ): Promise<{ outcomes: MergeOutcome[]; errors: number; aborted: boolean }> {
-  console.log(`[Auto-Merge] Processing organization: ${org}`);
+  logger.info(`[Auto-Merge] Processing organization: ${org}`);
 
   const outcomes: MergeOutcome[] = [];
   let errors = 0;
@@ -61,7 +61,7 @@ async function processOrganization(
   try {
     octokit = await authenticateOrganization(appClient, org, options.appId, options.privateKey);
   } catch (error) {
-    console.error(`[Auto-Merge] Authentication failed for ${org}:`, error instanceof Error ? error.message : String(error));
+    logger.error(`[Auto-Merge] Authentication failed for ${org}:`, { e: error });
     return { outcomes, errors: errors + 1, aborted: false };
   }
 
@@ -71,7 +71,7 @@ async function processOrganization(
     return { outcomes, errors: errors + 1, aborted: false };
   }
 
-  console.log(`[Auto-Merge] Found ${repos.length} repositories in ${org}`);
+  logger.info(`[Auto-Merge] Found ${repos.length} repositories in ${org}`);
 
   // Process each repository
   const context: ProcessingContext = {
@@ -108,12 +108,12 @@ async function processRepository(context: ProcessingContext, repo: RepositoryInf
   const repoName = `${org}/${repo.name}`;
   const defaultBranch = repo.default_branch ?? "development"; // standard in the ubiquity ecosystem
 
-  console.log(`[Auto-Merge] Checking ${repoName}`);
+  logger.info(`[Auto-Merge] Checking ${repoName}`);
 
   // Safety check: abort if running in a fork with open PR to upstream
   const guardResult = await checkForkSafety({ octokit, repo });
   if (guardResult.aborted) {
-    console.log(`[Auto-Merge] Aborted: ${guardResult.reason}`);
+    logger.info(`[Auto-Merge] Aborted: ${guardResult.reason}`);
     return { aborted: true };
   }
 
@@ -126,7 +126,7 @@ async function processRepository(context: ProcessingContext, repo: RepositoryInf
 
   // Skip archived repositories
   if (repo.archived) {
-    console.log(`[Auto-Merge] Skipping ${repoName}: archived`);
+    logger.info(`[Auto-Merge] Skipping ${repoName}: archived`);
     return {
       outcome: {
         ...outcome,
@@ -227,7 +227,7 @@ function checkBranchInactivity({
   const lastCommitDate = firstValidTimestamp([branch.commit.commit?.committer?.date, branch.commit.commit?.author?.date]);
 
   if (!lastCommitDate) {
-    console.log(`[Auto-Merge] Skipping ${repoName}: unable to determine last commit date`);
+    logger.info(`[Auto-Merge] Skipping ${repoName}: unable to determine last commit date`);
 
     return { skip: true, reason: "Unable to determine last commit date" };
   }
@@ -235,7 +235,7 @@ function checkBranchInactivity({
   const daysSinceLastCommit = Math.floor((Date.now() - lastCommitDate.getTime()) / MS_PER_DAY);
 
   if (lastCommitDate.getTime() > cutoffTime) {
-    console.log(`[Auto-Merge] Skipping ${repoName}: active (${daysSinceLastCommit} days old, threshold ${inactivityDays} days)`);
+    logger.info(`[Auto-Merge] Skipping ${repoName}: active (${daysSinceLastCommit} days old, threshold ${inactivityDays} days)`);
     return { skip: true, reason: "Development branch is still active" };
   }
 
@@ -262,7 +262,7 @@ async function attemptMerge({
   inactivityDays: number;
   defaultBranch: string;
 }): Promise<{ outcome?: MergeOutcome; error?: boolean }> {
-  console.log(`[Auto-Merge] Merging ${fullRepoName} (inactive for ${daysSinceLastCommit} days)`);
+  logger.info(`[Auto-Merge] Merging ${fullRepoName} (inactive for ${daysSinceLastCommit} days)`);
 
   try {
     const result = await mergeDefaultIntoMain({
@@ -284,7 +284,7 @@ async function attemptMerge({
     if (error instanceof Error && error.message.includes("Base does not exist")) {
       // Main branch does not exist, likely inside a fork/QA-organization - create it and retry
       await createMainBranch({ octokit, org, repoName, defaultBranch });
-      console.log(`[Auto-Merge] Created main branch for ${fullRepoName}, retrying merge...`);
+      logger.info(`[Auto-Merge] Created main branch for ${fullRepoName}, retrying merge...`);
       return await attemptMerge({
         octokit,
         org,
@@ -295,7 +295,7 @@ async function attemptMerge({
         defaultBranch,
       });
     }
-    console.error(`[Auto-Merge] Merge failed for ${fullRepoName}:`, error instanceof Error ? error.message : String(error));
+    logger.error(`[Auto-Merge] Merge failed for ${fullRepoName}:`, { e: error });
     return { error: true };
   }
 }
@@ -326,7 +326,7 @@ async function handleMergeResult({
   };
 
   if (result.status === 201) {
-    console.log(`[Auto-Merge] ✓ Merged ${fullRepoName} (SHA: ${result.sha})`);
+    logger.info(`[Auto-Merge] ✓ Merged ${fullRepoName} (SHA: ${result.sha})`);
     return {
       outcome: {
         ...outcome,
@@ -335,11 +335,11 @@ async function handleMergeResult({
       },
     };
   } else if (result.status === 204) {
-    console.log(`[Auto-Merge] ✓ ${fullRepoName} already up-to-date`);
+    logger.info(`[Auto-Merge] ✓ ${fullRepoName} already up-to-date`);
     return { outcome: { ...outcome, status: UP_TO_DATE } };
   } else if (result.status === 409) {
-    console.log(`[Auto-Merge] ✗ Merge conflict in ${fullRepoName}`);
-    await openPullRequest(octokit, org, repoName);
+    logger.info(`[Auto-Merge] ✗ Merge conflict in ${fullRepoName}`);
+    await openPullRequest({ octokit, org, repoName, defaultBranch });
     return { outcome: { ...outcome, status: "conflict" } };
   }
 

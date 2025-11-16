@@ -1,5 +1,5 @@
 import { runAutoMerge } from "./main";
-import { parseOrgs, requireEnv } from "./utils";
+import { logger, parseOrgs, requireEnv } from "./utils";
 
 async function main(): Promise<void> {
   const appId = requireEnv("APP_ID");
@@ -13,16 +13,16 @@ async function main(): Promise<void> {
   for (const o of result.outcomes) {
     switch (o.status) {
       case "merged":
-        console.log(`✅ ${o.org}/${o.repo}: merged ${o.defaultBranch} into main (${o.sha}).`);
+        logger.info(`✅ ${o.org}/${o.repo}: merged ${o.defaultBranch} into main (${o.sha}).`);
         break;
       case "up-to-date":
-        console.log(`ℹ️  ${o.org}/${o.repo}: main already contains ${o.defaultBranch}.`);
+        logger.info(`ℹ️  ${o.org}/${o.repo}: main already contains ${o.defaultBranch}.`);
         break;
       case "conflict":
-        console.log(`⚠️  ${o.org}/${o.repo}: merge conflict detected.`);
+        logger.info(`⚠️  ${o.org}/${o.repo}: merge conflict detected.`);
         break;
       case "skipped":
-        console.log(`⏭️  ${o.org}/${o.repo}: ${o.reason}.`);
+        logger.info(`⏭️  ${o.org}/${o.repo}: ${o.reason}.`);
         break;
     }
   }

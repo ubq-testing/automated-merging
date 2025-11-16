@@ -1,4 +1,5 @@
 import type { ForkGuardResult, Octokit } from "./types";
+import { logger } from "./utils";
 
 /**
  * Safety check: prevents running in a fork that has an open PR to upstream.
@@ -12,13 +13,13 @@ export async function forkSafetyGuard({ octokit, repoSlug }: { octokit: Octokit;
     });
 
     if (!repo.fork) {
-      console.log(`[Fork Guard] ${repoSlug.owner}/${repoSlug.repo} is not a fork`);
+      logger.info(`[Fork Guard] ${repoSlug.owner}/${repoSlug.repo} is not a fork`);
       return { safe: true };
     }
 
     const parent = repo.parent?.full_name;
     if (!parent) {
-      console.log(`[Fork Guard] Fork detected but parent unknown`);
+      logger.info(`[Fork Guard] Fork detected but parent unknown`);
       return { safe: false, reason: "fork detected with unknown parent" };
     }
 
@@ -31,17 +32,17 @@ export async function forkSafetyGuard({ octokit, repoSlug }: { octokit: Octokit;
     });
 
     if (pulls.length > 0) {
-      console.log(`[Fork Guard] Found open PR from ${repoSlug.owner}:main to ${parent}`);
+      logger.info(`[Fork Guard] Found open PR from ${repoSlug.owner}:main to ${parent}`);
       return {
         safe: false,
         reason: `open PR from ${repoSlug.owner}:main to ${parent}`,
       };
     }
 
-    console.log(`[Fork Guard] No open PRs found, safe to proceed`);
+    logger.info(`[Fork Guard] No open PRs found, safe to proceed`);
     return { safe: true };
   } catch (error) {
-    console.error(`[Fork Guard] Check failed:`, error instanceof Error ? error.message : String(error));
+    logger.error(`[Fork Guard] Check failed:`, { e: error });
     return { safe: false, reason: "fork guard check failed" };
   }
 }

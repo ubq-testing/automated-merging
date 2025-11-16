@@ -1,3 +1,5 @@
+import { LogLevel, Logs } from "@ubiquity-os/ubiquity-os-logger";
+
 export function normalizePrivateKey(raw: string): string {
   const material = raw.includes("BEGIN") ? raw : Buffer.from(raw, "base64").toString("utf8");
   return material.replace(/\\n/g, "\n");
@@ -37,3 +39,11 @@ export function parseOrgs(raw: string | string[]): string[] {
     throw new Error(`TARGET_ORGS must be a valid array or JSON array. Received: ${raw}`);
   }
 }
+
+// because it runs only in CI this should work fine
+const logLevel = typeof process.env.LOG_LEVEL === "string" ? process.env.LOG_LEVEL?.toLowerCase() : "info";
+
+/**
+ * Only for use in CI environments. Use `context.logger` elsewhere.
+ */
+export const logger = new Logs(logLevel as LogLevel);
